@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
+from intervaltree import Interval, IntervalTree
 
 def refParser(ref):
     dictRef = {}
@@ -16,6 +17,19 @@ def refParser(ref):
     return dictRef
 
 
+def clusterNearSVs(dictSVcoords):
+    trees = {}
+    for SV in dictSVcoords.keys():
+        coords = dictSVcoords[SV]
+        sv_chr = coords[0]
+        sv_start = int(coords[1]) - 1500
+        sv_end = int(coords[2]) + 1500
+        if sv_chr not in trees:
+            trees[sv_chr] = IntervalTree()
+        trees[sv_chr][sv_start:sv_end] = str(SV)
+    return trees
+
+
 parser = argparse.ArgumentParser( description='Parse FP')
 parser.add_argument('-vcf', '--vcf', required=False)
 parser.add_argument('-ref', '--reference', required=False)
@@ -25,6 +39,9 @@ args = parser.parse_args()
 
 fname = args.vcf
 bcf_in = VariantFile(fname)
+
+dictSVcoords = {}
+dictAllelesINS = {}
 
 for rec in bcf_in.fetch():
     if "BND" in str(rec):
@@ -38,15 +55,36 @@ for rec in bcf_in.fetch():
     sv_type = rec.info['SVTYPE']
     sv_filter = rec.filter
 
-    print(sv_id,sv_chr,sv_start, sv_start, sv_len)
-
     sv_end = int(sv_start) + int(sv_len)
     seq_ID = str(sv_id) + "_" + str(sv_chr) + "_" + str(sv_start) + "_" + str(sv_end)
 
-    print(sv_end,seq_ID)
+    dictSVcoords[sv_id] = [sv_chr, sv_start, sv_end]
 
+    sv_allele = rec.alleles[1]
+
+    if "INS" in sv_type:
+        dictAllelesINS[sv_id] = sv_allele
 
 dicRef = refParser(args.reference)
 
-for chr in dicRef.values():
-    print(chr[1])
+treeSV = clusterNearSVs(dictSVcoords)
+
+print(dicRef["1"][10369:10373])
+
+for SV in dictSVcoords.keys():
+    coords = dictSVcoords[SV]
+
+    sv_chr = coords[0]
+    sv_start = coords[1]
+    sv_start_prev = int(coords[1]) - 1
+    sv_start_next = int(coords[1]) + 1
+    sv_end = coords[2]
+    sv_len = sv_end - sv_start
+
+    ref_start_toExtract = sv_start - 1500
+    ref_end_toExtract = sv_end  + 1500
+
+    if "INS" in SV:
+        print(SV, sv_chr, sv_start, sv_end, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dictAllelesINS[SV],dicRef[sv_chr][sv_start_next:ref_end_toExtract])
+    elif "DEL" in SV:
+        print(SV, sv_chr, sv_start, sv_end, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dicRef[sv_chr][sv_start_next+sv_len:ref_end_toExtract])
