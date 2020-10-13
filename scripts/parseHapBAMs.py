@@ -20,7 +20,7 @@ args = parser.parse_args()
 
 
 bam1 = pysam.AlignmentFile(args.hap1, "rb", header=True)
-#bam2 = pysam.AlignmentFile(args.hap2, "rb", header=True)
+bam2 = pysam.AlignmentFile(args.hap2, "rb", header=True)
 
 fastaParse = SeqIO.parse(args.varfasta, "fasta")
 
