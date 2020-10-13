@@ -46,11 +46,16 @@ dictAllelesINS = {}
 for rec in bcf_in.fetch():
     if "BND" in str(rec):
         continue
-    sv_id = rec.id
+
+    sv_type = rec.info['SVTYPE']
+
+    if "INS" in rec.id or "DEL" in rec.id:
+        sv_id = rec.id
+    else:
+        sv_id = str(rec.id) + "_" + str(sv_type)
+
     sv_chr = rec.chrom
     sv_start = rec.pos
-    sv_reads = rec.info['RNAMES']
-    sv_read_support = rec.info['RE']
     sv_len = abs(rec.info['SVLEN'])
     sv_type = rec.info['SVTYPE']
     sv_filter = rec.filter
@@ -62,6 +67,8 @@ for rec in bcf_in.fetch():
 
     sv_allele = rec.alleles[1]
 
+    #print(sv_id, sv_chr, sv_start, sv_end, rec.alleles)
+
     if "INS" in sv_type:
         dictAllelesINS[sv_id] = sv_allele
 
@@ -69,7 +76,6 @@ dicRef = refParser(args.reference)
 
 treeSV = clusterNearSVs(dictSVcoords)
 
-print(dicRef["1"][10369:10373])
 
 for SV in dictSVcoords.keys():
     coords = dictSVcoords[SV]
@@ -82,9 +88,11 @@ for SV in dictSVcoords.keys():
     sv_len = sv_end - sv_start
 
     ref_start_toExtract = sv_start - 1500
-    ref_end_toExtract = sv_end  + 1500
+    ref_end_toExtract = sv_end + 1500
 
     if "INS" in SV:
-        print(SV, sv_chr, sv_start, sv_end, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dictAllelesINS[SV],dicRef[sv_chr][sv_start_next:ref_end_toExtract])
+        InsertedSeq = dictAllelesINS[SV]
+        print(">%s_%s_%s_ref%s-%s\n%s%s%s" % (SV, sv_chr, sv_start, ref_start_toExtract, ref_end_toExtract, dicRef[sv_chr][ref_start_toExtract:sv_start_prev], dictAllelesINS[SV], dicRef[sv_chr][sv_start_next:ref_end_toExtract]))
     elif "DEL" in SV:
-        print(SV, sv_chr, sv_start, sv_end, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dicRef[sv_chr][sv_start_next+sv_len:ref_end_toExtract])
+        DeletedSeq = dicRef[sv_chr][sv_start:sv_start+sv_len]
+        print(">%s_%s_%s_ref%s-%s\n%s%s" % (SV, sv_chr, sv_start, ref_start_toExtract,ref_end_toExtract, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dicRef[sv_chr][sv_start+sv_len:ref_end_toExtract]))
