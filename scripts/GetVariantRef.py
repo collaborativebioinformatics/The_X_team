@@ -58,12 +58,25 @@ for rec in bcf_in.fetch():
     sv_start = rec.pos
     sv_len = abs(rec.info['SVLEN'])
     sv_type = rec.info['SVTYPE']
-    sv_filter = rec.filter
+    sv_read_support = rec.info['RE']
+
+    gt_info_cuteSV = str(rec.samples[0]['GT'][0]) + "/" + str(rec.samples[0]['GT'][1])
+
+    gt_info = ""
+    if gt_info_cuteSV == "0/0":
+        gt_info = "Low_freq"
+    elif gt_info_cuteSV == "0/1":
+        gt_info = "Het"
+    elif gt_info_cuteSV == "1/1":
+        gt_info = "Hom"
+
+    for fil in rec.filter:
+        sv_filter = fil
 
     sv_end = int(sv_start) + int(sv_len)
     seq_ID = str(sv_id) + "_" + str(sv_chr) + "_" + str(sv_start) + "_" + str(sv_end)
 
-    dictSVcoords[sv_id] = [sv_chr, sv_start, sv_end]
+    dictSVcoords[sv_id] = [sv_chr, sv_start, sv_end, sv_filter, gt_info, sv_read_support]
 
     sv_allele = rec.alleles[1]
 
@@ -87,12 +100,16 @@ for SV in dictSVcoords.keys():
     sv_end = coords[2]
     sv_len = sv_end - sv_start
 
+    sv_filter = coords[3]
+    gt_info = coords[4]
+    sv_read_support = coords[5]
+
     ref_start_toExtract = sv_start - 1500
     ref_end_toExtract = sv_end + 1500
 
     if "INS" in SV:
         InsertedSeq = dictAllelesINS[SV]
-        print(">%s_%s_%s_ref%s-%s\n%s%s%s" % (SV, sv_chr, sv_start, ref_start_toExtract, ref_end_toExtract, dicRef[sv_chr][ref_start_toExtract:sv_start_prev], dictAllelesINS[SV], dicRef[sv_chr][sv_start_next:ref_end_toExtract]))
+        print(">%s_%s_%s_%s_%s_%s_ref%s-%s\n%s%s%s" % (SV, sv_chr, sv_start, sv_filter, gt_info, sv_read_support, ref_start_toExtract, ref_end_toExtract, dicRef[sv_chr][ref_start_toExtract:sv_start_prev], dictAllelesINS[SV], dicRef[sv_chr][sv_start_next:ref_end_toExtract]))
     elif "DEL" in SV:
         DeletedSeq = dicRef[sv_chr][sv_start:sv_start+sv_len]
-        print(">%s_%s_%s_ref%s-%s\n%s%s" % (SV, sv_chr, sv_start, ref_start_toExtract,ref_end_toExtract, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dicRef[sv_chr][sv_start+sv_len:ref_end_toExtract]))
+        print(">%s_%s_%s_%s_%s_%s_ref%s-%s\n%s%s" % (SV, sv_chr, sv_start, sv_filter, gt_info, sv_read_support, ref_start_toExtract,ref_end_toExtract, dicRef[sv_chr][ref_start_toExtract:sv_start_prev],dicRef[sv_chr][sv_start+sv_len:ref_end_toExtract]))
