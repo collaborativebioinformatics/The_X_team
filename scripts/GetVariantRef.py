@@ -52,7 +52,7 @@ for rec in bcf_in.fetch():
     if "INS" in rec.id or "DEL" in rec.id:
         sv_id = rec.id
     else:
-        sv_id = str(rec.id) + "_" + str(sv_type)
+        sv_id = str(rec.id) + "." + str(sv_type)
 
     sv_chr = rec.chrom
     sv_start = rec.pos
