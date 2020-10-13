@@ -27,7 +27,7 @@ def ParseHeader(name):
             "svtype" : svtype   }
 
 
-print("ID\tqLen\ttSpan,\tminDiff\t\tsvtype\tsvlen")
+print("ID\tqLen\ttSpan\tminDiff\tsvtype\tsvlen")
 for aln in bam:
     rEnd   = aln.reference_end
     rStart = aln.reference_start
