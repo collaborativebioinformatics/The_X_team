@@ -37,8 +37,8 @@ for aln in bam:
     qPos=[p[0] for p in pairs]
     rPos=[p[1] for p in pairs]
 
-    qStart = bisect.bisect_left(qPos, args.window)
-    qEnd = min(qStart+10,bisect.bisect_left(qPos, qPos[-1]-args.window+1))
+    qStart = bisect.bisect_left(qPos, args.window-20)
+    qEnd = min(args.window+10,bisect.bisect_left(qPos, qPos[-1]-args.window+20))
 
     tooBig=100000000
     minDiff = tooBig
