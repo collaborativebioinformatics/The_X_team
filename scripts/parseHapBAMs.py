@@ -39,6 +39,7 @@ for rec in bcf_in.fetch():
 for line in filSV.readlines():
     listSV.append(line.rstrip("\n"))
 LensDict = {}
+
 for seqRecord in fastaParse:
     id = seqRecord.id
     seqLen = len(seqRecord.seq)
