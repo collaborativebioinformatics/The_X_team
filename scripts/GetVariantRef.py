@@ -64,11 +64,13 @@ for rec in bcf_in.fetch():
 
     gt_info = ""
     if gt_info_cuteSV == "0/0":
-        gt_info = "Low_freq"
+        gt_info = "Lowfreq"
     elif gt_info_cuteSV == "0/1":
         gt_info = "Het"
     elif gt_info_cuteSV == "1/1":
         gt_info = "Hom"
+    else:
+        gt_info = "None"
 
     for fil in rec.filter:
         sv_filter = fil
