@@ -38,14 +38,14 @@ for aln in bam:
     rPos=[p[1] for p in pairs]
 
     qStart = bisect.bisect_left(qPos, args.window)
-    qEnd = bisect.bisect_left(qPos, qPos[-1]-args.window+1)
+    qEnd = min(qStart+10,bisect.bisect_left(qPos, qPos[-1]-args.window+1))
 
     tooBig=100000000
     minDiff = tooBig
     minS = None
     minE = None
     for s in range(qStart, 0, -args.skip):
-        for e in range(qEnd, len(qPos), args.window):
+        for e in range(qEnd, len(qPos), args.skip):
             qLen=qPos[e] - qPos[s]
             rLen=rPos[e] - rPos[s]
             alnDiff = abs(qLen-rLen)
