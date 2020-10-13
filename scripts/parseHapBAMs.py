@@ -24,9 +24,11 @@ bam2 = pysam.AlignmentFile(args.hap2, "rb", header=True)
 
 fastaParse = SeqIO.parse(args.varfasta, "fasta")
 
-filSV = open(args.listSVs, "r")
-
-listSV=[]
+if args.listSVs is not None:
+    filSV = open(args.listSVs, "r")
+    listSV=[]
+    for line in filSV.readlines():
+        listSV.append(line.rstrip("\n"))
 
 FPList=[]
 bcf_in = VariantFile(args.fp)
@@ -36,8 +38,6 @@ for rec in bcf_in.fetch():
     FPList.append(rec.id)
 
 
-for line in filSV.readlines():
-    listSV.append(line.rstrip("\n"))
 LensDict = {}
 
 for seqRecord in fastaParse:
@@ -47,7 +47,9 @@ for seqRecord in fastaParse:
 
 
 for record in bam1:
-    id=record.query_name.split("_")[0]
+    id = record.query_name.split("_")[0]
+    sv_len = record.query_name.split("_")[3]
+
     if int(record.flag) != 4:
         alignLen = int(record.reference_end) - int(record.reference_start)
         if record.is_secondary:
@@ -56,14 +58,22 @@ for record in bam1:
             continue
         if record.is_supplementary and record.is_secondary:
             continue
-        if id in listSV:
+        if args.listSVs is not None and id in listSV:
             if id in FPList:
                 print(record.query_name, LensDict[record.query_name], alignLen,"FP")
             else:
                 print(record.query_name, LensDict[record.query_name], alignLen,"TP")
 
+        if args.listSVs is None and int(sv_len) >= 50:
+            if id in FPList:
+                print(record.query_name, LensDict[record.query_name], alignLen,"FP")
+            else:
+                print(record.query_name, LensDict[record.query_name], alignLen,"TP")
 
-
-
+        if args.listSVs is None and int(sv_len) < 50:
+            if id in FPList:
+                print(record.query_name, LensDict[record.query_name], alignLen,"FP-le50")
+            else:
+                print(record.query_name, LensDict[record.query_name], alignLen,"le50")
 
 #for b in bam.fetch(chrom, startLook, endLook, until_eof=True):
