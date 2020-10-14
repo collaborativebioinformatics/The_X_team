@@ -3,13 +3,15 @@
 
 
 
-## Introduction
+# Introduction
 
 
-Benchmarking SV calling results is not always easy so here we provide a new method for verifying the presence of an SV using haplotype-resolved assemblies and compare results to Truvari. In X-SVLen we develop a framework to use haplotype-resolved assemblies for benchmarking SV detection algorithms.
+Benchmarking SV calling results is not always easy so here we provide a new method for verifying the presence of an SV in haplotype-resolved assemblies and compare results to Truvari. 
 
 
 # What is XSVLen?
+
+In X-SVLen we develop a framework to use haplotype-resolved assemblies for benchmarking SV detection algorithms.
 
 XSVLen takes cuteSV or Sniffles VCF and using reference coordinates will produce modified sequences having included inserted sequences or deleted sequences withing the reference sequence. By creating this modified sequences we could check for the presence of the predicted variants in haplotype-resolved assemblies.
 
