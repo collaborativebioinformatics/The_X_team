@@ -1,16 +1,9 @@
 ![logo](./images/XSVLEN.PNG)
 
-## Please cite our work -- here is the ICMJE Standard Citation:
 
-### ...and a link to the DOI:
 
-## Awesome Logo
 
-### You can make a free DOI with zenodo <link>
-
-## Website (if applicable)
-
-## Intro statement
+## Introduction
 
 Curation of datasets 
 
