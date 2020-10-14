@@ -14,6 +14,8 @@ XSVLen takes cuteSV or Sniffles VCF and using reference coordinates will produce
 
 The variant sequences will be mapped into the assemblies using minimap2 and length of alignment will be compared to variant queries length. 
 
+Truvari annotation for a run using default parameters (except pctsim that is set equal to 0) and a permissive run using --refdist 1000 --pctsize 0 --multimatch will be parsed and all SVs processed for XSVLen will be annotated for including Truvari results for downstream comparisons.
+
 A report summary will be produced using an R script. 
 
 # Workflow diagram
