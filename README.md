@@ -1,4 +1,4 @@
-![logo](./images/XSVLEN.png)
+![logo](./images/XSVLEN.PNG)
 
 ## Please cite our work -- here is the ICMJE Standard Citation:
 
