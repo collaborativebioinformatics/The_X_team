@@ -26,3 +26,5 @@ A report summary will be produced using an R script.
   
 A Nextflow workflow is produced
 
+The workflow requires, python3, minimap2, nextflow, and R >=3.5.0.
+
