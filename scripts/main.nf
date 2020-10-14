@@ -82,7 +82,7 @@ process score{
     set replicateId, file(bam1), file(bam2) from mergeMapQueryReceiver
 
   output:
-    set replicateId, file("${replicateId}.bam") into scoreReceiver
+    set replicateId, file("MaternalPaternal.score") into scoreReceiver
 
   script:
     """
