@@ -7,6 +7,37 @@ if(params.r && params.longMode){
     .into { read_ch_pbhifi; read_ch_NGMLR; read_ch_NGMLR_CLR; read_ch_preprocessSniffles; read_ch_preprocessFai; read_CLR_ch_minimap; read_CCS_ch_minimap}
 }
 
+/*Given a SV vcf as input
+5:22
+we want to run Rocio's script to generate a query
+5:22
+then map the query to both haplotypes to make a bam
+5:22
+then run my script to evaluate the scores of each bam (e.g. a haplotype 1 bam and a haplotype 2 bam)
+5:23
+Rocio's script is GetVariantRef.py
+5:23
+min is ScoreAlignment.py*/
+
+process map_assemblies {
+
+}
+
+process generate_queries_from_vcf{
+  (GetVariantRef.py)
+}
+
+process map_queries{
+  (minimap2)
+}
+
+process compare_boundaries{
+
+}
+
+process score{
+  ScoreAlignment.py
+}
 
 process minimap2_pacbio_CLR{
     tag "${replicateId}"
