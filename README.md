@@ -5,7 +5,8 @@
 
 ## Introduction
 
-Benchmarking SV calling results is not always easy so here we provide a new method for verifying the presence of an SV using haplotype-resolved assemblies and compare results to Truvari.
+
+Benchmarking SV calling results is not always easy so here we provide a new method for verifying the presence of an SV using haplotype-resolved assemblies and compare results to Truvari. In X-SVLen we develop a framework to use haplotype-resolved assemblies for benchmarking SV detection algorithms.
 
 
 # What is XSVLen?
