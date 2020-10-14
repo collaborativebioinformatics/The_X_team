@@ -35,7 +35,7 @@ process generate_queries_from_vcf{
     """ 
 }
 
-//
+// priya's code
 process map_queries{
   tag "${replicateId}"
   publishDir "{params.outputDir}/mapQueries", mode: 'copy'
@@ -54,6 +54,21 @@ process map_queries{
     """
 }
 
+// just merge results
+process merge_map_query {
+    input:
+        file "*" from mapQueryReceiver.collect()
+
+    output:
+        file "mergeMapQuery" into mergeMapQueryReceiver
+
+    script:
+    """
+    mkdir mergeMapQuery;
+    scp *.bam mergeMapQuery;
+    """
+}
+
 process compare_boundaries{
 
 }
@@ -64,8 +79,7 @@ process score{
   publishDir "{params.outputDir}/score", mode: 'copy'
 
   input:
-    set replicateId, file(/*TODO*/) from mapQueryReceiver
-    file ref from oneRef
+    set replicateId, file(bam1), file(bam2) from mergeMapQueryReceiver
 
   output:
     set replicateId, file("${replicateId}.bam") into scoreReceiver
@@ -79,8 +93,22 @@ process score{
   
 }
 
+// so then you would run Rocio's script to annotate Truvari
 process annotation_support{
-  python ~/PycharmProjects/The_X_team/scripts/AnnotateJointSupportTab.py -tab MaternalPaternal.tab -truvariFP fp-noBed_default_noPASS_refPASS.vcf  --fpParam fp-noBed_pct0_refdist1000_multi_noPASS_refPASS.vcf -hap1 SV4_paternal_primary.sorted.bam -hap2 SV4_maternal_primary.sorted.bam > MaternalPaternal-Extraannot-withHAPcoords.tab
+
+  tag "${replicateId}"
+  publishDir "{params.outputDir}/annotation", mode: 'copy'
+
+  input:
+    set replicateId, file(score) from scoreReceiver
+
+  output:
+    set replicateId, file("MaternalPaternal-Extraannot-withHAPcoords.tab") into scoreReceiver
+
+  script:
+  """"
+  python $params.program/AnnotateJointSupportTab.py -tab MaternalPaternal.tab -truvariFP fp-noBed_default_noPASS_refPASS.vcf  --fpParam fp-noBed_pct0_refdist1000_multi_noPASS_refPASS.vcf -hap1 SV4_paternal_primary.sorted.bam -hap2 SV4_maternal_primary.sorted.bam > MaternalPaternal-Extraannot-withHAPcoords.tab
+  """"
 }
 
 process map_contig_ref{
