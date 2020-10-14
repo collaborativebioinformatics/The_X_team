@@ -1,17 +1,20 @@
-t <- read.table("MaternalPaternal.tab")
-
 library(stringr)
 
+args = commandArgs(trailingOnly=TRUE)
+
+t <- read.table(args[1])
+
 head(t)
+
 hom <- which(str_detect(t$V1, "Hom"))
 het <- which(str_detect(t$V1, "Het"))
 low <- which(str_detect(t$V1, "Lowfreq"))
 maxLen <- 3e4
 shortSV <- which(t$V9 < 3e4 & t$V9 >= 50)
-matConf <- which(t$V7 < 10) | t$V7 < 0.05*t$V9)
+matConf <- which(t$V7 < 10 | t$V7 < 0.05*t$V9)
 patConf <- which(t$V15 < 10 | t$V15 < 0.05*t$V17)
 
-matConfStrict <- which(t$V7 < 5) | t$V7 < 0.05*t$V9)
+matConfStrict <- which(t$V7 < 5 | t$V7 < 0.05*t$V9)
 patConfStrict <- which(t$V15 < 5 | t$V15 < 0.05*t$V17)
 
 plot(sort(t$V9*0.05), log="y")
