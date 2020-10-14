@@ -15,7 +15,7 @@ In X-SVLen we develop a framework to use haplotype-resolved assemblies for bench
 
 XSVLen takes cuteSV or Sniffles VCF and using reference coordinates will produce modified sequences having included inserted sequences or deleted sequences withing the reference sequence. By creating this modified sequences we could check for the presence of the predicted variants in haplotype-resolved assemblies.
 
-The resulting ‘query’ sequences are mapped to both haplotypes. 
+The resulting ‘query’ sequences are mapped to both haplotypes using minimap2. 
 
 Truvari annotation for a run using default parameters (except pctsim that is set equal to 0) and a permissive run using --refdist 1000 --pctsize 0 --multimatch will be parsed and all SVs processed for XSVLen will be annotated for including Truvari results for downstream comparisons.
 
