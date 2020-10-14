@@ -1,57 +1,99 @@
-oneRef = file(params.oneRef)
-if(params.r && params.longMode){
-    Channel
-    .fromPath( params.longPath )
-    .map { file -> tuple(file.baseName, file) }
-    .ifEmpty { error "Oops! Cannot find any file matching: ${params.ref}"}
-    .into { read_ch_pbhifi; read_ch_NGMLR; read_ch_NGMLR_CLR; read_ch_preprocessSniffles; read_ch_preprocessFai; read_CLR_ch_minimap; read_CCS_ch_minimap}
-}
+/*
+ * -------------------------------------------------
+ *   Nextflow main script
+ *   Author: Chunxiao Liao
+ * -------------------------------------------------
+ * Pipeline management script.
+ */
 
-/*Given a SV vcf as input
-5:22
-we want to run Rocio's script to generate a query
-5:22
-then map the query to both haplotypes to make a bam
-5:22
-then run my script to evaluate the scores of each bam (e.g. a haplotype 1 bam and a haplotype 2 bam)
-5:23
-Rocio's script is GetVariantRef.py
-5:23
-min is ScoreAlignment.py*/
+oneRef = file(params.oneRef)
+vcfChannel = Channel.fromPath(params.vcfPath)
+contigChannel = Channel.fromPath(params.contigPath)
+
 
 process map_assemblies {
 
 }
 
+//to run Rocio's script to generate a query
 process generate_queries_from_vcf{
-  (GetVariantRef.py)
+  tag "${replicateId}"
+  publishDir "{params.outputDir}/generateQueries", mode: 'copy'
+
+  input:
+    set replicateId, file(vcf) from vcfChannel
+    file ref from oneRef
+
+  output:
+    set replicateId, file("TODO") into mapQueriesReceiver
+
+  script:
+    """
+    gunzip $vcf
+    python params.program/GetVariantRef.py --vcf cuteSV_v108_hg37_hg002_g4015_8reads.vcf --ref $ref > cuteSV_v108_hg37_hg002_g4015_8reads_variants_v2.fasta
+    python params.program/parseHapBAMs.py --hap1 The_X_team:/minimap2_output/SV2/SV2_paternal.sorted.bam --hap2 The_X_team:/minimap2_output/SV2/SV2_maternal.sorted.bam --varfasta cuteSV_v108_hg37_hg002_g4015_8reads_variants_v2.fasta --fp fp-noBed_default_noPASS_refPASS.vcf > table-Len-Allen-all-v2.tsv
+    """ 
 }
 
+//
 process map_queries{
-  (minimap2)
+  tag "${replicateId}"
+  publishDir "{params.outputDir}/mapQueries", mode: 'copy'
+
+  input:
+    set replicateId, file("TODO") from "TODO"
+    file ref from oneRef
+
+  output:
+    set replicateId, file("${replicateId}.bam") into mapQueryReceiver
+
+  script:
+    """
+    minimap2 -d ref.mmi $ref 
+    minimap2 -a ref.mmi sv4.fasta | samtools view -bS - | samtools sort - > ${replicateId}.bam
+    """
 }
 
 process compare_boundaries{
 
 }
 
+//to evaluate the scores of each bam (e.g. a haplotype 1 bam and a haplotype 2 bam)
 process score{
-  ScoreAlignment.py
+  tag "${replicateId}"
+  publishDir "{params.outputDir}/score", mode: 'copy'
+
+  input:
+    set replicateId, file(/*TODO*/) from mapQueryReceiver
+    file ref from oneRef
+
+  output:
+    set replicateId, file("${replicateId}.bam") into scoreReceiver
+
+  script:
+  //TODO
+    """
+    
+    python ScoreAlignment.py
+    """
+  
 }
 
-process minimap2_pacbio_CLR{
+process map_contig_ref{
     tag "${replicateId}"
-    publishDir "{params.outputDir}/minimap2PacbioCLR", mode: 'copy'
+    publishDir "{params.outputDir}/mapContigRef", mode: 'copy'
 
     input:
-    set replicateId, file(reads) from read_CLR_ch_minimap.mix(pb_optional_CLR_ch_minimap)
+    set replicateId, file(contig) from contigChannel
     file ref from oneRef
 
     output:
-    set replicateId, file("${replicateId}.bam") into minimap2PacbioCLRReceiver
+    set replicateId, file("${replicateId}_filtered.bed") into mapContigRefReceiver
 
     script:
     """
-    minimap2 -ax map-pb $ref $reads | samtools view -bS - | samtools sort - > ${replicateId}.bam
+    minimap2 -ax asm5 $ref $contig | samtools view -bS - | samtools sort - > ${replicateId}.bam
+    bedtools bamtobed -i ${replicateId}.bam > ${replicateId}.bed
+    python $params.program/bedParser.py ${replicateId}.bed ${replicateId}_filtered.bed
     """
 }
