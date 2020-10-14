@@ -1,4 +1,4 @@
-![logo](./images/XSVLEN.PNG)
+![logo](./images/NewLogo.png)
 
 
 
