@@ -25,7 +25,7 @@ process generate_queries_from_vcf{
     file ref from oneRef
 
   output:
-    set replicateId, file("table-Len-Allen-all-v2.tsv") into mapQueriesReceiver
+    set replicateId, file("cuteSV_v108_hg37_hg002_g4015_8reads_variants_v2.fasta") into mapQueriesReceiver
 
   script:
     """
@@ -41,7 +41,7 @@ process map_queries{
   publishDir "{params.outputDir}/mapQueries", mode: 'copy'
 
   input:
-    set replicateId, file("TODO") from "TODO"
+    set replicateId, file(sv4.fasta) from mapQueriesReceiver
     file ref from oneRef
 
   output:
@@ -50,7 +50,7 @@ process map_queries{
   script:
     """
     minimap2 -d ref.mmi $ref 
-    minimap2 -a ref.mmi sv4.fasta | samtools view -bS - | samtools sort - > ${replicateId}.bam
+    minimap2 -a ref.mmi $sv4.fasta | samtools view -bS - | samtools sort - > ${replicateId}.bam
     """
 }
 
