@@ -27,10 +27,15 @@ def ParseHeader(name):
             "svtype" : svtype   }
 
 
-print("ID\tqLen\ttSpan\tminDiff\tsvtype\tsvlen")
+print("chrom\tpos\tnext\tID\tqLen\ttSpan\tminDiff\tsvtype\tsvlen")
 for aln in bam:
+    if (aln.seq is None):
+        continue
+    
     rEnd   = aln.reference_end
     rStart = aln.reference_start
+    if rEnd is None or rStart is None:
+        continue
     if (rEnd - rStart < 2*args.window):
         continue
     pairs=aln.get_aligned_pairs(matches_only=True)
@@ -38,7 +43,7 @@ for aln in bam:
     rPos=[p[1] for p in pairs]
 
     qStart = bisect.bisect_left(qPos, args.window-20)
-    qEnd = min(args.window+10,bisect.bisect_left(qPos, qPos[-1]-args.window+20))
+    qEnd   = bisect.bisect_left(qPos, qPos[-1]-args.window+20)
 
     tooBig=100000000
     minDiff = tooBig
@@ -56,7 +61,7 @@ for aln in bam:
     header=ParseHeader(aln.query_name)
 
     if aln.seq is not None:
-        print(aln.query_name + "\t" + str(len(aln.seq)) + "\t" + str(rEnd-rStart) + "\t" + str(minDiff) + "\t" + header["svtype"] + "\t" + header["svlen"])
+        print(header["chrom"] + "\t" + header["start"] + "\t" + str(int(header["start"])+1) + "\t" + aln.query_name + "\t" + str(len(aln.seq)) + "\t" + str(rEnd-rStart) + "\t" + str(minDiff) + "\t" + header["svtype"] + "\t" + header["svlen"])
 
     
 

@@ -1,4 +1,4 @@
-# The_X_team
+![logo](./images/XSVLEN.PNG)
 
 ## Please cite our work -- here is the ICMJE Standard Citation:
 
@@ -11,6 +11,8 @@
 ## Website (if applicable)
 
 ## Intro statement
+
+Curation of datasets 
 
 ## What's the problem?
 

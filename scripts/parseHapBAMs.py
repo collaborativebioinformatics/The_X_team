@@ -85,6 +85,7 @@ for rec in bam2:
     else:
         alignLen2 = int(rec.reference_end) - int(rec.reference_start)
         AlLenHap2[id2] = alignLen2
+print("sv_id varSeq_len sv_len sv_gt alLen_hap1 alLen_hap2 truvari_annot")
 
 for id in AlLenHap1.keys():
     if args.listSVs is not None and id in listSV:
@@ -103,7 +104,7 @@ for id in AlLenHap1.keys():
         if id in FPList:
             print(id, LensDict[id], SVInfo[id][0], SVInfo[id][1], AlLenHap1[id], AlLenHap2[id],"FP-le50")
         else:
-            print(id, LensDict[id], SVInfo[id][0], SVInfo[id][1], AlLenHap1[id], AlLenHap2[id],"le50")
+            print(id, LensDict[id], SVInfo[id][0], SVInfo[id][1], AlLenHap1[id], AlLenHap2[id],"not_measured")
 
 
 #for b in bam.fetch(chrom, startLook, endLook, until_eof=True):
