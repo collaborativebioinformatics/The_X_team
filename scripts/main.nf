@@ -25,7 +25,7 @@ process generate_queries_from_vcf{
     file ref from oneRef
 
   output:
-    set replicateId, file("TODO") into mapQueriesReceiver
+    set replicateId, file("table-Len-Allen-all-v2.tsv") into mapQueriesReceiver
 
   script:
     """
@@ -71,12 +71,16 @@ process score{
     set replicateId, file("${replicateId}.bam") into scoreReceiver
 
   script:
-  //TODO
     """
-    
-    python ScoreAlignment.py
+    python ScoreAlignment.py $bam1 $bam2 maternal.score paternal.score
+
+    ./CreateJointSupportTab.sh maternal.score paternal.score MaternalPaternal.score
     """
   
+}
+
+process annotation_support{
+  python ~/PycharmProjects/The_X_team/scripts/AnnotateJointSupportTab.py -tab MaternalPaternal.tab -truvariFP fp-noBed_default_noPASS_refPASS.vcf  --fpParam fp-noBed_pct0_refdist1000_multi_noPASS_refPASS.vcf -hap1 SV4_paternal_primary.sorted.bam -hap2 SV4_maternal_primary.sorted.bam > MaternalPaternal-Extraannot-withHAPcoords.tab
 }
 
 process map_contig_ref{
