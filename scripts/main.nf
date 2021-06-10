@@ -107,7 +107,7 @@ process annotation_support{
 
   script:
   """"
-  python $params.program/AnnotateJointSupportTab.py -tab MaternalPaternal.tab -truvariFP fp-noBed_default_noPASS_refPASS.vcf  --fpParam fp-noBed_pct0_refdist1000_multi_noPASS_refPASS.vcf -hap1 SV4_paternal_primary.sorted.bam -hap2 SV4_maternal_primary.sorted.bam > MaternalPaternal-Extraannot-withHAPcoords.tab
+  python $params.program/AnnotateJointSupportTab.py -tab MaternalPaternal.tab -truvariFP fp-noBed_default_noPASS_refPASS.vcf -truvariTP tp-noBed_default_noPASS_refPASS.vcf -hap1 SV4_paternal_primary.sorted.bam -hap2 SV4_maternal_primary.sorted.bam > MaternalPaternal-Extraannot-withHAPcoords.tab
   """"
 }
 
